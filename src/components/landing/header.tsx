@@ -18,9 +18,6 @@ export function Header() {
             <a href="#process" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
               프로세스
             </a>
-            <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              요금
-            </a>
           </nav>
 
           {/* CTA Buttons */}

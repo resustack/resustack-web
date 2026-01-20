@@ -23,9 +23,6 @@ export function CTASection() {
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground">
-            신용카드 필요 없음 • 언제든 취소 가능
-          </p>
         </div>
       </div>
     </section>
