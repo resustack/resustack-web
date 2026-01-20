@@ -1,0 +1,179 @@
+language: ko-KR
+enable_free_tier: true
+
+tone_instructions: >
+  실력 있는 시니어 프론트엔드 개발자 동료로서 주니어 개발자의 성장을 돕습니다.
+  명확하고 구체적인 피드백을 제공하며, 관련 문서를 추천하고, 비판보다 개선 중심의 제안을 우선합니다.
+  Vercel Engineering의 React Best Practices (v1.0.0)를 기준으로 CRITICAL > HIGH > MEDIUM 우선순위로 리뷰합니다.
+
+reviews:
+  profile: "chill"
+  high_level_summary: true
+  changed_files_summary: false
+  assess_linked_issues: true
+  poem: false
+  suggested_reviewers: false
+  auto_assign_reviewers: false
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+
+  # 프론트엔드 특화 리뷰 규칙
+  request_changes_workflow: false
+
+  # 특정 파일 타입에 대한 추가 검토
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/.next/**"
+    - "!**/dist/**"
+    - "!**/build/**"
+    - "!**/*.test.{ts,tsx}"
+    - "!**/*.spec.{ts,tsx}"
+
+  path_instructions:
+    - path: "**"
+      instructions: |
+        프론트엔드 특화 커스텀 지침 (React Best Practices v1.0.0 기반)
+        추가 리뷰 지침 - Vercel Engineering의 성능 최적화 규칙 적용:
+    
+        [CRITICAL 이슈 - 즉시 수정 요청]
+    
+        1. Waterfalls 제거 (가장 큰 성능 영향):
+           ❌ 잘못된 패턴:
+           ```typescript
+           const user = await fetchUser()
+           const posts = await fetchPosts()  // waterfall!
+           ```
+           ✅ 올바른 패턴:
+           ```typescript
+           const [user, posts] = await Promise.all([fetchUser(), fetchPosts()])
+           ```
+           - Sequential await 발견 시 즉시 지적
+           - if문 분기 전에 await하는 경우 defer 제안
+           - API 라우트에서 연속된 fetch 금지
+    
+        2. Barrel Import 금지 (번들 크기 급증):
+           ❌ 잘못된 패턴:
+           ```typescript
+           import { Check } from 'lucide-react'  // 전체 라이브러리 로드!
+           ```
+           ✅ 올바른 패턴:
+           ```typescript
+           import Check from 'lucide-react/dist/esm/icons/check'
+           ```
+           - lucide-react, lodash 등에서 barrel import 발견 시 즉시 지적
+           - 직접 파일 경로로 import 하도록 수정 요청
+    
+        3. 무거운 컴포넌트 동적 임포트:
+           ❌ 잘못된 패턴:
+           ```typescript
+           import MonacoEditor from './monaco-editor'
+           ```
+           ✅ 올바른 패턴:
+           ```typescript
+           const MonacoEditor = dynamic(() => import('./monaco-editor'), { ssr: false })
+           ```
+           - Chart, Editor, Map 등 무거운 라이브러리는 dynamic import 필수
+           - 초기 번들에 포함되지 않도록 확인
+    
+        [HIGH 우선순위]
+    
+        4. Server Component 최적화:
+           - 'use client' 사용을 최소화 (leaf 컴포넌트에만)
+           - Server Component에서 병렬 데이터 페칭:
+           ```typescript
+           async function Page() {
+             const [user, posts] = await Promise.all([
+               fetchUser(),
+               fetchPosts()
+             ])
+           }
+           ```
+           - RSC 경계에서 직렬화되는 데이터 최소화
+    
+        5. React.cache() 활용:
+           ```typescript
+           import { cache } from 'react'
+           const getUser = cache(async (id) => {
+             return await db.user.findUnique({ where: { id } })
+           })
+           ```
+           - 동일 요청 내 중복 호출 자동 제거
+    
+        [MEDIUM 우선순위]
+    
+        6. 리렌더 최적화:
+           - 불필요한 리렌더 방지:
+           ```typescript
+           // ❌ 전체 리렌더
+           const Component = () => {
+             const [state, setState] = useState()
+             return <Heavy state={state} />
+           }
+    
+           // ✅ memo로 격리
+           const Heavy = memo(({ state }) => { ... })
+           ```
+           - useEffect 의존성 배열 최소화
+           - 파생 상태는 useMemo 사용
+    
+        7. 컴포넌트 구조:
+           - 하나의 파일에 하나의 주요 컴포넌트만 export
+           - 200줄 이상의 컴포넌트는 분리를 제안
+           - prop drilling이 3단계 이상이면 상태 관리 라이브러리 사용 검토
+           - 정적 JSX는 컴포넌트 외부로 hoist:
+           ```typescript
+           const EMPTY_STATE = <div>No data</div>  // 상단에 정의
+           ```
+    
+        8. Next.js 특화:
+           - next/image, next/font 등 최적화 도구 활용 권장
+           - Metadata API를 활용한 SEO 최적화 확인
+           - Suspense boundary 전략적 배치로 점진적 렌더링
+    
+        [LOW-MEDIUM 우선순위]
+    
+        9. JavaScript 최적화 (핫 패스에만):
+           - 루프 내 속성 접근 캐싱:
+           ```typescript
+           // ❌
+           for (let i = 0; i < items.length; i++)
+    
+           // ✅
+           const len = items.length
+           for (let i = 0; i < len; i++)
+           ```
+           - 배열 변경 시 toSorted() 사용 (불변성)
+           - Set/Map으로 O(1) 조회
+    
+        10. 접근성:
+            - button, input 등의 적절한 시맨틱 태그 사용
+            - 이미지에 alt 텍스트 필수
+            - 색상 대비, 포커스 상태 확인
+    
+        11. 타입스크립트:
+            - any 대신 unknown 또는 구체적인 타입 사용
+            - 인터페이스보다 타입(type) 우선 (일관성 유지)
+            - Prop 타입은 명시적으로 정의
+    
+        12. 스타일링:
+            - Tailwind 유틸리티 클래스를 일관되게 사용
+            - 반복되는 스타일 조합은 컴포넌트나 유틸리티로 추출
+            - cn() 헬퍼 함수를 활용한 조건부 스타일링
+    
+        리뷰 시 우선순위에 따라 CRITICAL > HIGH > MEDIUM 순서로 피드백하고,
+        각 지적사항에는 구체적인 코드 예시와 성능 영향도를 함께 제시합니다.
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  web_search:
+    enabled: true
+  learnings:
+    scope: local
+  issues:
+    scope: local
+  pull_requests:
+    scope: local

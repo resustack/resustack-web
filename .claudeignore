@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Cache
+.turbo/
+.vercel/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing (node_modules 내 테스트 제외)
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Documentation (필요시 주석 해제)
+# *.md
+# !README.md
+# !CLAUDE.md
+
+# Lock files (거의 읽지 않음)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Config files (필요시만 읽음)
+.prettierrc
+.editorconfig
+.coderabbit.yaml
+
+# Environment
+.env*
+!.env.example
