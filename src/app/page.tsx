@@ -1,12 +1,36 @@
+import { AnimatedWrapper } from '@/components/landing/animated-wrapper';
+import { Header } from '@/components/landing/header';
+import { HeroSection } from '@/components/landing/hero-section';
+import { ProblemSection } from '@/components/landing/problem-section';
+import { FeaturesSection } from '@/components/landing/features-section';
+import { UserFlowSection } from '@/components/landing/user-flow-section';
+import { CTASection } from '@/components/landing/cta-section';
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">ResuStack</h1>
-        <p className="text-xl text-gray-600">
-          입력은 블록으로, 완성은 AI로. 가장 빠른 이력서 빌더
-        </p>
-      </div>
+    <>
+      <Header />
+      <main className="min-h-screen">
+      <AnimatedWrapper animation="fade-in" delay={0}>
+        <HeroSection />
+      </AnimatedWrapper>
+
+      <AnimatedWrapper animation="slide-up" delay={100}>
+        <ProblemSection />
+      </AnimatedWrapper>
+
+      <AnimatedWrapper animation="slide-up" delay={200}>
+        <FeaturesSection />
+      </AnimatedWrapper>
+
+      <AnimatedWrapper animation="slide-up" delay={300}>
+        <UserFlowSection />
+      </AnimatedWrapper>
+
+      <AnimatedWrapper animation="slide-up" delay={400}>
+        <CTASection />
+      </AnimatedWrapper>
     </main>
+    </>
   );
 }
