@@ -37,9 +37,6 @@ pnpm-debug.log*
 .env.development
 .env.production
 
-# MCP (Model Context Protocol)
-.mcp.json
-
 # vercel
 .vercel
 
