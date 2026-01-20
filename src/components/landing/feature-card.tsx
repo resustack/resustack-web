@@ -17,7 +17,7 @@ export function FeatureCard({ title, description, icon: Icon, items, badge }: Fe
       <CardHeader>
         <div className="flex items-start justify-between mb-4">
           <div className="p-3 rounded-lg bg-primary/10">
-            <Icon className="w-8 h-8 text-primary" />
+            <Icon className="w-8 h-8 text-primary" aria-hidden="true" />
           </div>
           {badge && (
             <Badge variant="secondary" className="text-xs">
@@ -32,7 +32,7 @@ export function FeatureCard({ title, description, icon: Icon, items, badge }: Fe
         <ul className="space-y-3">
           {items.map((item, index) => (
             <li key={index} className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+              <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" aria-hidden="true" />
               <span className="text-sm text-muted-foreground">{item}</span>
             </li>
           ))}

@@ -18,32 +18,65 @@ export function AnimatedWrapper({
   className = '',
 }: AnimatedWrapperProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ref.current || !isMounted) return;
+
+    const element = ref.current;
+    let hasTriggered = false;
+
+    const triggerAnimation = () => {
+      if (hasTriggered) return;
+      hasTriggered = true;
+
+      timeoutRef.current = setTimeout(() => {
+        setIsVisible(true);
+      }, delay);
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => {
-            setIsVisible(true);
-          }, delay);
+          triggerAnimation();
           observer.disconnect();
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
+        threshold: 0,
+        rootMargin: '100px',
       }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    // 관찰 시작
+    observer.observe(element);
+
+    // 초기 상태 체크를 다음 프레임에서 수행
+    requestAnimationFrame(() => {
+      if (!element) return;
+
+      const rect = element.getBoundingClientRect();
+      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+
+      if (isInViewport) {
+        triggerAnimation();
+        observer.disconnect();
+      }
+    });
 
     return () => {
       observer.disconnect();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, [delay]);
+  }, [delay, isMounted]);
 
   const getAnimationClasses = () => {
     const baseClasses = 'transition-all duration-700 ease-out';

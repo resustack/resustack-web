@@ -39,7 +39,7 @@ export function ProblemSection() {
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-start gap-4">
                     <div className="p-3 rounded-lg bg-destructive/10">
-                      <Icon className="w-6 h-6 text-destructive" />
+                      <Icon className="w-6 h-6 text-destructive" aria-hidden="true" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-semibold mb-2">{problem.title}</h3>
