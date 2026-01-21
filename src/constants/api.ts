@@ -29,10 +29,11 @@ export const AUTH_ENDPOINTS = {
   LOGOUT: `${AUTH_SERVER_URL}/api/auth/logout`,
 } as const;
 
-// API 엔드포인트 (추후 확장용)
+// API 엔드포인트
 export const API_ENDPOINTS = {
   BASE_URL: API_SERVER_URL,
-  // TODO: API 엔드포인트 추가
+  // 이력서 관련
+  RESUMES: `${API_SERVER_URL}/api/resumes`,
 } as const;
 
 // 리다이렉트 URL (백엔드 설정용)

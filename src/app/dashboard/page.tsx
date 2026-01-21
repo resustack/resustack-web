@@ -1,24 +1,26 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Plus from 'lucide-react/dist/esm/icons/plus';
-import FileText from 'lucide-react/dist/esm/icons/file-text';
 import LogOut from 'lucide-react/dist/esm/icons/log-out';
 import { useAuth } from '@/hooks/use-auth';
-
-type Resume = {
-  id: string;
-  title: string;
-  updatedAt: string;
-  status: 'draft' | 'completed';
-};
+import { useResumes } from '@/hooks/use-resumes';
+import { ResumeCard } from '@/components/dashboard/resume-card';
+import { LoginRequiredState, LoadingState, EmptyResumeState } from '@/components/dashboard/empty-states';
+import { ResumePagination } from '@/components/dashboard/resume-pagination';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { isLoggedIn, userName, logout, revalidate } = useAuth();
+  const [currentPage, setCurrentPage] = useState(0);
+  const { resumes, pagination, isLoading } = useResumes({
+    page: currentPage,
+    size: 10,
+    enabled: isLoggedIn
+  });
 
   useEffect(() => {
     // URL 쿼리 파라미터 확인
@@ -32,11 +34,6 @@ export default function DashboardPage() {
       router.replace('/dashboard');
     }
   }, [revalidate, router]);
-
-  const resumes: Resume[] = [
-    // Placeholder 데이터
-    // { id: '1', title: '프론트엔드 개발자 이력서', updatedAt: '2025-01-20', status: 'draft' },
-  ];
 
   const handleLogout = async () => {
     await logout();
@@ -110,53 +107,28 @@ export default function DashboardPage() {
 
           {/* Resumes List */}
           <div className="space-y-4">
-            {resumes.length === 0 ? (
-              /* Empty State */
-              <div className="border-2 border-dashed border-border rounded-lg p-12">
-                <div className="flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FileText className="w-8 h-8 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold">
-                      아직 이력서가 없습니다
-                    </h3>
-                    <p className="text-muted-foreground max-w-md">
-                      첫 이력서를 만들어보세요. 블록 단위로 간편하게 작성하고,
-                      AI가 실시간으로 검증하고 최적화합니다.
-                    </p>
-                  </div>
-                  <Button className="gap-2 mt-4">
-                    <Plus className="w-4 h-4" />
-                    첫 이력서 만들기
-                  </Button>
-                </div>
-              </div>
+            {!isLoggedIn ? (
+              <LoginRequiredState />
+            ) : isLoading ? (
+              <LoadingState />
+            ) : resumes.length === 0 ? (
+              <EmptyResumeState />
             ) : (
-              /* Resumes Grid */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {resumes.map((resume) => (
-                  <div
-                    key={resume.id}
-                    className="border border-border rounded-lg p-6 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer bg-card"
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <FileText className="w-8 h-8 text-primary" />
-                        <span className="text-xs text-muted-foreground">
-                          {resume.status === 'draft' ? '작성 중' : '완료'}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold text-lg line-clamp-2">
-                        {resume.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        최근 수정: {resume.updatedAt}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {resumes.map((resume) => (
+                    <ResumeCard key={resume.id} resume={resume} />
+                  ))}
+                </div>
+
+                <ResumePagination
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  hasNext={pagination.hasNext}
+                  hasPrevious={pagination.hasPrevious}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             )}
           </div>
 
