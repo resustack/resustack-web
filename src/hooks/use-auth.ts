@@ -30,29 +30,32 @@ type UserInfo = {
  * SWR fetcher
  */
 async function fetchUserInfo(): Promise<UserInfo | null> {
+  let response: Response;
+
   try {
-    const response = await fetch(AUTH_ENDPOINTS.ME, {
+    response = await fetch(AUTH_ENDPOINTS.ME, {
       credentials: 'include', // HttpOnly 쿠키 포함
     });
-
-    if (response.ok) {
-      const result: ResponseData<UserInfo> = await response.json();
-      return result.data;
-    }
-
-    if (response.status === 401) {
-      // 인증되지 않음 (정상 케이스)
-      return null;
-    }
-
-    // 404 또는 기타 에러
-    const result: ResponseData<UserInfo> = await response.json();
-    console.error('Failed to fetch user info:', result.errorCode?.message);
-    return null;
   } catch (error) {
+    // 네트워크 에러 (fetch 실패)
     console.error('Network error:', error);
     throw error; // SWR이 에러 처리
   }
+
+  if (response.ok) {
+    const result: ResponseData<UserInfo> = await response.json();
+    return result.data;
+  }
+
+  if (response.status === 401) {
+    // 인증되지 않음 (정상 케이스)
+    return null;
+  }
+
+  // 404 또는 기타 에러는 SWR error로 노출
+  const result: ResponseData<UserInfo> = await response.json();
+  const message = result.errorCode?.message ?? response.statusText;
+  throw new Error(message);
 }
 
 /**

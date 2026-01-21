@@ -18,7 +18,7 @@ type Resume = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isLoggedIn, userName, login, logout, checkAuth } = useAuth();
+  const { isLoggedIn, userName, logout, revalidate } = useAuth();
 
   useEffect(() => {
     // URL 쿼리 파라미터 확인
@@ -26,24 +26,20 @@ export default function DashboardPage() {
     const loginSuccess = params.get('login');
 
     if (loginSuccess === 'success') {
-      // 백엔드에서 로그인 성공 후 리다이렉트된 경우
-      console.log('[Dashboard] 로그인 성공 감지');
-      login('사용자'); // TODO: 실제 사용자 정보는 API에서 가져오기
-
-      // URL에서 쿼리 파라미터 제거
-      window.history.replaceState({}, '', '/dashboard');
-    } else {
-      checkAuth();
+      // 로그인 성공 시 사용자 정보 재검증
+      revalidate();
+      // URL에서 쿼리 파라미터 제거 (히스토리 정리)
+      router.replace('/dashboard');
     }
-  }, [checkAuth, login]);
+  }, [revalidate, router]);
 
   const resumes: Resume[] = [
     // Placeholder 데이터
     // { id: '1', title: '프론트엔드 개발자 이력서', updatedAt: '2025-01-20', status: 'draft' },
   ];
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/');
   };
 

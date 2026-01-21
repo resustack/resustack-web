@@ -63,13 +63,13 @@ export default function LoginPage() {
               <div className="text-center text-sm text-muted-foreground space-y-2">
                 <p>로그인하면 ResuStack의</p>
                 <p>
-                  <a href="#" className="text-primary hover:underline">
+                  <span className="text-muted-foreground">
                     이용약관
-                  </a>
+                  </span>
                   {' '}및{' '}
-                  <a href="#" className="text-primary hover:underline">
+                  <span className="text-muted-foreground">
                     개인정보처리방침
-                  </a>
+                  </span>
                   에 동의하게 됩니다.
                 </p>
               </div>
