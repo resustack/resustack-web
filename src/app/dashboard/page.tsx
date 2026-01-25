@@ -97,11 +97,14 @@ export default function DashboardPage() {
           {/* Create New Resume Button */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
+              asChild
               size="lg"
               className="gap-2 shadow-md hover:shadow-lg transition-all"
             >
-              <Plus className="w-5 h-5" />
-              새 이력서 만들기
+              <Link href="/dashboard/resumes/new">
+                <Plus className="w-5 h-5" />
+                새 이력서 만들기
+              </Link>
             </Button>
           </div>
 

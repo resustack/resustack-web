@@ -1,16 +1,18 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 import FileText from 'lucide-react/dist/esm/icons/file-text';
 import { useResume } from '@/hooks/use-resume';
+import { useDeleteResume } from '@/hooks/use-delete-resume';
 import { ResumeHeader } from '@/components/resume/resume-header';
 import { ProfileSection } from '@/components/resume/profile-section';
 import { SkillsSection } from '@/components/resume/skills-section';
 import { SectionsContent } from '@/components/resume/sections-content';
+import { DeleteConfirmation } from '@/components/resume/delete-confirmation';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -20,6 +22,23 @@ export default function ResumeDetailPage({ params }: PageProps) {
   const router = useRouter();
   const { id } = use(params);
   const { resume, isLoading, error } = useResume(id);
+  const { deleteResume, isDeleting } = useDeleteResume();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleEdit = () => {
+    router.push(`/dashboard/resumes/${id}/edit`);
+  };
+
+  const handleDelete = async () => {
+    try {
+      setDeleteError(null);
+      await deleteResume(id);
+      router.push('/dashboard');
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : '이력서 삭제에 실패했습니다.');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -136,6 +155,8 @@ export default function ResumeDetailPage({ params }: PageProps) {
               title={resume.title}
               status={resume.status}
               isPublic={resume.public}
+              onEdit={handleEdit}
+              onDelete={() => setShowDeleteConfirm(true)}
             />
 
             {/* Content */}
@@ -175,6 +196,24 @@ export default function ResumeDetailPage({ params }: PageProps) {
           </div>
         </div>
       </main>
+
+      {/* Delete Confirmation */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="max-w-md w-full">
+            <DeleteConfirmation
+              isDeleting={isDeleting}
+              onConfirm={handleDelete}
+              onCancel={() => setShowDeleteConfirm(false)}
+            />
+            {deleteError && (
+              <div className="mt-4 p-4 bg-destructive/10 border border-destructive rounded-lg">
+                <p className="text-sm text-destructive">{deleteError}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

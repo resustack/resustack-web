@@ -34,6 +34,8 @@ export const API_ENDPOINTS = {
   BASE_URL: API_SERVER_URL,
   // 이력서 관련
   RESUMES: `${API_SERVER_URL}/api/resumes`,
+  // 템플릿 관련
+  TEMPLATES: `${API_SERVER_URL}/api/templates`,
 } as const;
 
 // 리다이렉트 URL (백엔드 설정용)

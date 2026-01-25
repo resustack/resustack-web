@@ -140,3 +140,85 @@ export type ResumeDetail = {
  * 이력서 상세 조회 응답
  */
 export type ResumeDetailResponse = ApiResponse<ResumeDetail>;
+
+/**
+ * 이력서 생성 요청
+ */
+export type ResumeCreateRequest = {
+  title: string;
+  templateId: string;
+  profile?: Profile;
+  sections?: Section[];
+  skills?: Skills;
+  public?: boolean;
+};
+
+/**
+ * 이력서 수정 요청
+ */
+export type ResumeUpdateRequest = {
+  title: string;
+  profile?: Profile;
+  sections?: Section[];
+  skills?: Skills;
+  public?: boolean;
+};
+
+/**
+ * 템플릿 상태
+ */
+export type TemplateStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED';
+
+/**
+ * 레이아웃 타입
+ */
+export type LayoutType = 'SINGLE_COLUMN' | 'TWO_COLUMN_LEFT';
+
+/**
+ * 여백 정보
+ */
+export type Spacing = {
+  section?: number;
+  block?: number;
+  line?: number;
+};
+
+/**
+ * 테마 정보
+ */
+export type Theme = {
+  primaryColor: string;
+  secondaryColor: string;
+  fontFamily?: string;
+  spacing?: Spacing;
+};
+
+/**
+ * 기본 섹션 정보
+ */
+export type DefaultSection = {
+  type: SectionType;
+  title: string;
+  orderIndex: number;
+};
+
+/**
+ * 템플릿 정보
+ */
+export type Template = {
+  id: string;
+  name: string;
+  description: string;
+  thumbnail: string;
+  layoutType: LayoutType;
+  theme: Theme;
+  defaultSections: DefaultSection[];
+  status: TemplateStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/**
+ * 템플릿 목록 조회 응답
+ */
+export type TemplateListResponse = ApiResponse<Template[]>;

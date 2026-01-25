@@ -8,9 +8,11 @@ type ResumeHeaderProps = {
   title: string;
   status: ResumeStatus;
   isPublic: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
 };
 
-export function ResumeHeader({ title, status, isPublic }: ResumeHeaderProps) {
+export function ResumeHeader({ title, status, isPublic, onEdit, onDelete }: ResumeHeaderProps) {
   return (
     <div className="border-b border-border p-6">
       <div className="flex items-start justify-between gap-4">
@@ -29,11 +31,11 @@ export function ResumeHeader({ title, status, isPublic }: ResumeHeaderProps) {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={onEdit}>
             <Edit className="w-4 h-4" />
             편집
           </Button>
-          <Button variant="outline" size="sm" className="gap-2 text-destructive hover:bg-destructive/10">
+          <Button variant="outline" size="sm" className="gap-2 text-destructive hover:bg-destructive/10" onClick={onDelete}>
             <Trash2 className="w-4 h-4" />
             삭제
           </Button>
