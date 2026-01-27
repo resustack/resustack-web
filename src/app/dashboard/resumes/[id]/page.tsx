@@ -1,7 +1,7 @@
 'use client';
 
-import { use, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
@@ -20,9 +20,9 @@ type PageProps = {
 
 export default function ResumeDetailPage({ params }: PageProps) {
   const router = useRouter();
-  const { id } = use(params);
+  const { id } = useParams<{ id: string }>();
   const { resume, isLoading, error } = useResume(id);
-  const { deleteResume, isDeleting } = useDeleteResume();
+  const { remove: deleteResume, isDeleting } = useDeleteResume();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 

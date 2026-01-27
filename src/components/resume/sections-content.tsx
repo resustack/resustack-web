@@ -53,20 +53,23 @@ export function SectionsContent({ sections }: SectionsContentProps) {
     <div className="space-y-4">
       <h2 className="text-lg font-semibold border-b pb-2">상세 내용</h2>
       <div className="space-y-6">
-        {sections.map((section) => (
-          <div key={section.id} className="space-y-3">
-            <h3 className="font-semibold text-base">{section.title}</h3>
-            {section.blocks && section.blocks.length > 0 ? (
-              <div className="space-y-4">
-                {section.blocks.map((block) => (
-                  <BlockCard key={block.id} block={block} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">내용이 없습니다.</p>
-            )}
-          </div>
-        ))}
+        {sections.map((section) => {
+          const visibleBlocks = section.blocks?.filter((block) => block.visible !== false) ?? [];
+          return (
+            <div key={section.id} className="space-y-3">
+              <h3 className="font-semibold text-base">{section.title}</h3>
+              {visibleBlocks.length > 0 ? (
+                <div className="space-y-4">
+                  {visibleBlocks.map((block) => (
+                    <BlockCard key={block.id} block={block} />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">내용이 없습니다.</p>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

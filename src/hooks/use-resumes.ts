@@ -69,18 +69,7 @@ async function fetchResumes(params: ResumeListParams = {}): Promise<FetchResumes
   }
 
   if (response.status === 401) {
-    // 인증되지 않음
-    return {
-      resumes: [],
-      pagination: {
-        totalElements: 0,
-        totalPages: 0,
-        currentPage: 0,
-        pageSize: size,
-        hasNext: false,
-        hasPrevious: false,
-      },
-    };
+    throw new Error('로그인이 필요합니다.');
   }
 
   // 기타 에러

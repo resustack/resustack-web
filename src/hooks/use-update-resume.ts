@@ -33,11 +33,18 @@ async function updateResume(id: string, data: ResumeUpdateRequest): Promise<Upda
   }
 
   if (response.ok) {
-    const result: ResumeDetailResponse = await response.json();
-    return {
-      resume: result.data,
-      error: null,
-    };
+    try {
+      const result: ResumeDetailResponse = await response.json();
+      return {
+        resume: result.data,
+        error: null,
+      };
+    } catch {
+      return {
+        resume: null,
+        error: '응답 처리 중 오류가 발생했습니다.',
+      };
+    }
   }
 
   if (response.status === 401) {
@@ -61,12 +68,19 @@ async function updateResume(id: string, data: ResumeUpdateRequest): Promise<Upda
     };
   }
 
-  const result: ResumeDetailResponse = await response.json();
-  const message = result.errorCode ?? response.statusText;
-  return {
-    resume: null,
-    error: message,
-  };
+  try {
+    const result: ResumeDetailResponse = await response.json();
+    const message = result.errorCode ?? response.statusText;
+    return {
+      resume: null,
+      error: message,
+    };
+  } catch {
+    return {
+      resume: null,
+      error: response.statusText,
+    };
+  }
 }
 
 /**
@@ -78,19 +92,22 @@ export function useUpdateResume() {
 
   const update = async (id: string, data: ResumeUpdateRequest) => {
     setIsUpdating(true);
-    const result = await updateResume(id, data);
-    setIsUpdating(false);
+    try {
+      const result = await updateResume(id, data);
 
-    if (result.resume) {
-      // 상세 조회 캐시 무효화
-      await Promise.all([
-        mutate(`/api/resumes/${id}`),
-        // 목록 캐시 무효화
-        mutate((key) => typeof key === 'string' && key.startsWith('/api/resumes?')),
-      ]);
+      if (result.resume) {
+        // 상세 조회 캐시 무효화
+        await Promise.all([
+          mutate(`/api/resumes/${id}`),
+          // 목록 캐시 무효화
+          mutate((key) => typeof key === 'string' && key.startsWith('/api/resumes?')),
+        ]);
+      }
+
+      return result;
+    } finally {
+      setIsUpdating(false);
     }
-
-    return result;
   };
 
   return {

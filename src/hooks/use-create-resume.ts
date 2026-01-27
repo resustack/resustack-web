@@ -33,11 +33,18 @@ async function createResume(data: ResumeCreateRequest): Promise<CreateResumeResu
   }
 
   if (response.ok) {
-    const result: ResumeDetailResponse = await response.json();
-    return {
-      resume: result.data,
-      error: null,
-    };
+    try {
+      const result: ResumeDetailResponse = await response.json();
+      return {
+        resume: result.data,
+        error: null,
+      };
+    } catch {
+      return {
+        resume: null,
+        error: '응답 처리 중 오류가 발생했습니다.',
+      };
+    }
   }
 
   if (response.status === 401) {
@@ -47,12 +54,19 @@ async function createResume(data: ResumeCreateRequest): Promise<CreateResumeResu
     };
   }
 
-  const result: ResumeDetailResponse = await response.json();
-  const message = result.errorCode ?? response.statusText;
-  return {
-    resume: null,
-    error: message,
-  };
+  try {
+    const result: ResumeDetailResponse = await response.json();
+    const message = result.errorCode ?? response.statusText;
+    return {
+      resume: null,
+      error: message,
+    };
+  } catch {
+    return {
+      resume: null,
+      error: response.statusText,
+    };
+  }
 }
 
 /**
@@ -64,15 +78,18 @@ export function useCreateResume() {
 
   const create = async (data: ResumeCreateRequest) => {
     setIsCreating(true);
-    const result = await createResume(data);
-    setIsCreating(false);
+    try {
+      const result = await createResume(data);
 
-    if (result.resume) {
-      // 목록 캐시 무효화
-      await mutate((key) => typeof key === 'string' && key.startsWith('/api/resumes?'));
+      if (result.resume) {
+        // 목록 캐시 무효화
+        await mutate((key) => typeof key === 'string' && key.startsWith('/api/resumes?'));
+      }
+
+      return result;
+    } finally {
+      setIsCreating(false);
     }
-
-    return result;
   };
 
   return {

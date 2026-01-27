@@ -55,9 +55,11 @@ export function EmptyResumeState() {
             AI가 실시간으로 검증하고 최적화합니다.
           </p>
         </div>
-        <Button className="gap-2 mt-4">
-          <Plus className="w-4 h-4" />
-          첫 이력서 만들기
+        <Button asChild className="gap-2 mt-4">
+          <Link href="/dashboard/resumes/new">
+            <Plus className="w-4 h-4" />
+            첫 이력서 만들기
+          </Link>
         </Button>
       </div>
     </div>

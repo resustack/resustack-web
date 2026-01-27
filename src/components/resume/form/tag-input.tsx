@@ -8,9 +8,10 @@ type TagInputProps = {
   onChange: (tags: string[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  id?: string;
 };
 
-export function TagInput({ value, onChange, placeholder, disabled }: TagInputProps) {
+export function TagInput({ value, onChange, placeholder, disabled, id }: TagInputProps) {
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -64,6 +65,7 @@ export function TagInput({ value, onChange, placeholder, disabled }: TagInputPro
         ))}
         <input
           ref={inputRef}
+          id={id}
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

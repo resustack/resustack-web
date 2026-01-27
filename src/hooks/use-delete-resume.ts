@@ -58,12 +58,19 @@ async function deleteResume(id: string): Promise<DeleteResumeResult> {
     };
   }
 
-  const result: ApiResponse<unknown> = await response.json();
-  const message = result.errorCode ?? response.statusText;
-  return {
-    success: false,
-    error: message,
-  };
+  try {
+    const result: ApiResponse<unknown> = await response.json();
+    const message = result.errorCode ?? response.statusText;
+    return {
+      success: false,
+      error: message,
+    };
+  } catch {
+    return {
+      success: false,
+      error: response.statusText,
+    };
+  }
 }
 
 /**
@@ -75,19 +82,22 @@ export function useDeleteResume() {
 
   const remove = async (id: string) => {
     setIsDeleting(true);
-    const result = await deleteResume(id);
-    setIsDeleting(false);
+    try {
+      const result = await deleteResume(id);
 
-    if (result.success) {
-      // 상세 조회 캐시 무효화
-      await Promise.all([
-        mutate(`/api/resumes/${id}`),
-        // 목록 캐시 무효화
-        mutate((key) => typeof key === 'string' && key.startsWith('/api/resumes?')),
-      ]);
+      if (result.success) {
+        // 상세 조회 캐시 무효화
+        await Promise.all([
+          mutate(`/api/resumes/${id}`),
+          // 목록 캐시 무효화
+          mutate((key) => typeof key === 'string' && key.startsWith('/api/resumes?')),
+        ]);
+      }
+
+      return result;
+    } finally {
+      setIsDeleting(false);
     }
-
-    return result;
   };
 
   return {
