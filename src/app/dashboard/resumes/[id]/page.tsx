@@ -31,12 +31,13 @@ export default function ResumeDetailPage({ params }: PageProps) {
   };
 
   const handleDelete = async () => {
-    try {
-      setDeleteError(null);
-      await deleteResume(id);
+    setDeleteError(null);
+    const result = await deleteResume(id);
+
+    if (result.success) {
       router.push('/dashboard');
-    } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : '이력서 삭제에 실패했습니다.');
+    } else {
+      setDeleteError(result.error ?? '이력서 삭제에 실패했습니다.');
     }
   };
 
