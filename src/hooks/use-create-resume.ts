@@ -1,0 +1,99 @@
+import { useState } from 'react';
+import { useSWRConfig } from 'swr';
+import { API_ENDPOINTS } from '@/constants/api';
+import type { ResumeCreateRequest, ResumeDetail, ResumeDetailResponse } from '@/types/resume';
+
+type CreateResumeResult = {
+  resume: ResumeDetail | null;
+  error: string | null;
+};
+
+/**
+ * 이력서 생성 fetcher
+ */
+async function createResume(data: ResumeCreateRequest): Promise<CreateResumeResult> {
+  let response: Response;
+
+  try {
+    response = await fetch(API_ENDPOINTS.RESUMES, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Version': '1.0',
+      },
+      body: JSON.stringify(data),
+    });
+  } catch (error) {
+    console.error('Network error:', error);
+    return {
+      resume: null,
+      error: '네트워크 오류가 발생했습니다.',
+    };
+  }
+
+  if (response.ok) {
+    try {
+      const result: ResumeDetailResponse = await response.json();
+      return {
+        resume: result.data,
+        error: null,
+      };
+    } catch {
+      return {
+        resume: null,
+        error: '응답 처리 중 오류가 발생했습니다.',
+      };
+    }
+  }
+
+  if (response.status === 401) {
+    return {
+      resume: null,
+      error: '로그인이 필요합니다.',
+    };
+  }
+
+  try {
+    const result: ResumeDetailResponse = await response.json();
+    const message = result.errorCode ?? response.statusText;
+    return {
+      resume: null,
+      error: message,
+    };
+  } catch {
+    return {
+      resume: null,
+      error: response.statusText,
+    };
+  }
+}
+
+/**
+ * 이력서 생성 훅
+ */
+export function useCreateResume() {
+  const { mutate } = useSWRConfig();
+  const [isCreating, setIsCreating] = useState(false);
+
+  const create = async (data: ResumeCreateRequest) => {
+    setIsCreating(true);
+    try {
+      const result = await createResume(data);
+
+      if (result.resume) {
+        // 목록 캐시 무효화
+        await mutate((key) => typeof key === 'string' && key.startsWith('/api/resumes?'));
+      }
+
+      return result;
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  return {
+    create,
+    isCreating,
+  };
+}
